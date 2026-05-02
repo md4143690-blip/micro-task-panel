@@ -2,19 +2,26 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MicroEarn Pro - Premium Earnings</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; overflow-x: hidden; }
         .tab-view { transition: opacity 0.3s ease; }
         .hidden-view { display: none !important; }
         .gradient-bg { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
         .sidebar-link-active { background: #6366f1; color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
         #wheel { transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
+        
+        /* Mobile Sidebar Transition */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        .sidebar-open { transform: translateX(0); }
+        .sidebar-closed { transform: translateX(-100%); }
+        @media (min-width: 768px) {
+            .sidebar-closed { transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -22,12 +29,12 @@
     <!-- Screen Loader -->
     <div id="mainLoader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
         <div class="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="font-bold text-indigo-600 animate-pulse tracking-widest uppercase text-sm">Initializing System...</p>
+        <p class="font-bold text-indigo-600 animate-pulse tracking-widest uppercase text-sm">সিস্টেম চালু হচ্ছে...</p>
     </div>
 
     <!-- UI Notification -->
-    <div id="notify" class="fixed top-5 right-5 z-[10000] transform translate-x-full transition-transform duration-500">
-        <div class="bg-white shadow-2xl rounded-2xl p-4 border-l-4 border-indigo-500 flex items-center gap-4 min-w-[280px]">
+    <div id="notify" class="fixed top-5 right-5 z-[10000] transform translate-x-full transition-transform duration-500 w-11/12 max-w-sm md:w-auto">
+        <div class="bg-white shadow-2xl rounded-2xl p-4 border-l-4 border-indigo-500 flex items-center gap-4">
             <div id="notifyIcon" class="text-2xl text-indigo-500"></div>
             <div>
                 <h4 id="notifyTitle" class="font-bold text-gray-800 text-sm"></h4>
@@ -37,29 +44,29 @@
     </div>
 
     <!-- ================= AUTH INTERFACE ================= -->
-    <div id="authPanel" class="hidden-view min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <div id="authPanel" class="hidden-view min-h-screen flex items-center justify-center p-4 md:p-6 bg-slate-50">
         <div class="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
-            <div class="p-10">
+            <div class="p-8 md:p-10">
                 <div class="text-center mb-10">
                     <div class="w-16 h-16 bg-indigo-600 rounded-2xl rotate-12 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200">
                         <i class="fas fa-bolt text-white text-3xl -rotate-12"></i>
                     </div>
                     <h2 class="text-3xl font-black text-gray-900 tracking-tight">MicroEarn Pro</h2>
-                    <p id="authSubtitle" class="text-gray-400 font-medium mt-2">আপনার উপার্জনের যাত্রা শুরু করুন</p>
+                    <p class="text-gray-400 font-medium mt-2">আপনার উপার্জনের যাত্রা শুরু করুন</p>
                 </div>
 
                 <form id="loginForm" class="space-y-4">
-                    <input type="email" id="email" placeholder="ইমেইল অ্যাড্রেস" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-medium" required>
-                    <input type="password" id="password" placeholder="পাসওয়ার্ড" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-medium" required>
-                    <button type="submit" class="w-full py-4 gradient-bg text-white rounded-2xl font-bold shadow-lg hover:opacity-90 transition-all">লগইন করুন</button>
+                    <input type="email" id="email" placeholder="ইমেইল অ্যাড্রেস" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium" required>
+                    <input type="password" id="password" placeholder="পাসওয়ার্ড" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium" required>
+                    <button type="submit" class="w-full py-4 gradient-bg text-white rounded-2xl font-bold shadow-lg hover:opacity-90 transition-all active:scale-95">লগইন করুন</button>
                     <p class="text-center text-sm font-medium text-gray-500">অ্যাকাউন্ট নেই? <button type="button" onclick="toggleAuth(false)" class="text-indigo-600 font-bold">নতুন তৈরি করুন</button></p>
                 </form>
 
                 <form id="regForm" class="hidden-view space-y-4">
-                    <input type="text" id="regName" placeholder="আপনার সম্পূর্ণ নাম" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none transition-all font-medium" required>
-                    <input type="email" id="regEmail" placeholder="ইমেইল অ্যাড্রেস" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none transition-all font-medium" required>
-                    <input type="password" id="regPass" placeholder="পাসওয়ার্ড (৬+ অক্ষর)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none transition-all font-medium" minlength="6" required>
-                    <button type="submit" class="w-full py-4 gradient-bg text-white rounded-2xl font-bold shadow-lg hover:opacity-90 transition-all">রেজিস্ট্রেশন করুন</button>
+                    <input type="text" id="regName" placeholder="আপনার সম্পূর্ণ নাম" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium" required>
+                    <input type="email" id="regEmail" placeholder="ইমেইল অ্যাড্রেস" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium" required>
+                    <input type="password" id="regPass" placeholder="পাসওয়ার্ড (৬+ অক্ষর)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium" minlength="6" required>
+                    <button type="submit" class="w-full py-4 gradient-bg text-white rounded-2xl font-bold shadow-lg hover:opacity-90 transition-all active:scale-95">রেজিস্ট্রেশন করুন</button>
                     <p class="text-center text-sm font-medium text-gray-500">ইতিমধ্যেই অ্যাকাউন্ট আছে? <button type="button" onclick="toggleAuth(true)" class="text-indigo-600 font-bold">লগইন করুন</button></p>
                 </form>
             </div>
@@ -67,170 +74,209 @@
     </div>
 
     <!-- ================= MAIN APP INTERFACE ================= -->
-    <div id="mainPanel" class="hidden-view min-h-screen flex flex-col md:flex-row">
+    <div id="mainPanel" class="hidden-view h-screen flex flex-col md:flex-row overflow-hidden">
         
+        <!-- Mobile Header (Visible only on small screens) -->
+        <div class="md:hidden flex items-center justify-between p-4 bg-white shadow-sm z-40 relative">
+            <h1 class="text-xl font-black text-indigo-600 flex items-center gap-2"><i class="fas fa-bolt"></i> MicroEarn</h1>
+            <button onclick="toggleSidebar()" class="text-gray-600 focus:outline-none p-2"><i class="fas fa-bars text-2xl"></i></button>
+        </div>
+
+        <!-- Sidebar Background Overlay (Mobile) -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden"></div>
+
         <!-- Sidebar -->
-        <aside class="w-full md:w-72 bg-white border-r border-gray-100 flex flex-col z-50">
-            <div class="p-8">
+        <aside id="sidebar" class="sidebar-closed fixed md:relative w-72 h-full bg-white border-r border-gray-100 flex flex-col z-50 shadow-2xl md:shadow-none">
+            <div class="p-8 hidden md:block">
                 <h1 class="text-2xl font-black text-indigo-600 tracking-tighter flex items-center gap-2">
                     <i class="fas fa-bolt"></i> MicroEarn
                 </h1>
             </div>
-            <nav class="flex-grow px-4 space-y-2">
+            
+            <!-- Mobile Close Button -->
+            <div class="p-4 flex justify-end md:hidden">
+                <button onclick="toggleSidebar()" class="text-gray-500 p-2"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <nav class="flex-grow px-4 space-y-2 overflow-y-auto">
                 <button onclick="switchTab('home')" class="tab-btn sidebar-link-active w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-gray-500 transition-all">
-                    <i class="fas fa-home"></i> হোম
+                    <i class="fas fa-home w-5"></i> হোম
                 </button>
                 <button onclick="switchTab('tasks')" class="tab-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-gray-500 transition-all">
-                    <i class="fas fa-tasks"></i> কাজসমূহ
+                    <i class="fas fa-tasks w-5"></i> কাজসমূহ
                 </button>
                 <button onclick="switchTab('spin')" class="tab-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-gray-500 transition-all">
-                    <i class="fas fa-dharmachakra"></i> স্পিন
+                    <i class="fas fa-dharmachakra w-5"></i> স্পিন
                 </button>
                 <button onclick="switchTab('wallet')" class="tab-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-gray-500 transition-all">
-                    <i class="fas fa-wallet"></i> উত্তোলন
+                    <i class="fas fa-wallet w-5"></i> উত্তোলন
                 </button>
                 
-                <!-- Admin Section -->
+                <!-- Admin Section (Will appear dynamically) -->
                 <div id="adminLink" class="hidden pt-6 mt-6 border-t border-gray-50">
-                    <p class="px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">প্রশাসন</p>
-                    <button onclick="switchTab('admin')" class="tab-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-red-500 bg-red-50 hover:bg-red-100 transition-all">
-                        <i class="fas fa-user-shield"></i> অ্যাডমিন প্যানেল
+                    <p class="px-6 text-[10px] font-black text-red-400 uppercase tracking-widest mb-2">প্রশাসন এলাকা</p>
+                    <button onclick="switchTab('admin')" class="tab-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-red-500 bg-red-50 hover:bg-red-100 transition-all border border-red-100">
+                        <i class="fas fa-user-shield w-5"></i> অ্যাডমিন প্যানেল
                     </button>
                 </div>
             </nav>
             
-            <div class="p-6 border-t border-gray-50">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-4">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">ইউজার আইডি</p>
+            <div class="p-6 border-t border-gray-50 mt-auto">
+                <div class="bg-slate-50 p-4 rounded-2xl mb-4 text-center md:text-left">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">ইউজার</p>
                     <p id="uIdDisplay" class="text-xs font-mono font-bold text-gray-700 truncate">...</p>
                 </div>
-                <button onclick="appLogout()" class="w-full py-4 text-red-500 font-bold hover:bg-red-50 rounded-2xl transition-all">লগআউট</button>
+                <button onclick="appLogout()" class="w-full py-4 text-red-500 font-bold hover:bg-red-50 rounded-2xl transition-all flex justify-center items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> লগআউট
+                </button>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-grow p-6 md:p-10 bg-[#f8fafc] overflow-y-auto max-h-screen">
+        <!-- Main Content Area -->
+        <main class="flex-grow p-4 md:p-10 bg-[#f8fafc] overflow-y-auto relative w-full">
             
-            <!-- Home View -->
-            <div id="homeView" class="tab-content space-y-8">
-                <div class="flex justify-between items-center">
+            <!-- ====== Home View ====== -->
+            <div id="homeView" class="tab-content space-y-6 md:space-y-8 pb-20 md:pb-0">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
-                        <h2 class="text-3xl font-black text-slate-800">ড্যাশবোর্ড</h2>
-                        <p class="text-slate-400 font-medium">স্বাগতম, <span id="uNameDisplay" class="text-indigo-600">...</span></p>
+                        <h2 class="text-2xl md:text-3xl font-black text-slate-800">ড্যাশবোর্ড</h2>
+                        <p class="text-slate-400 font-medium">স্বাগতম, <span id="uNameDisplay" class="text-indigo-600 font-bold">...</span></p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="gradient-bg p-8 rounded-[2.5rem] text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
-                        <i class="fas fa-wallet absolute -right-4 -bottom-4 text-8xl opacity-10"></i>
-                        <p class="text-sm font-bold opacity-80 uppercase tracking-widest">বর্তমান ব্যালেন্স</p>
-                        <h3 class="text-5xl font-black mt-2">৳ <span id="balDisplay">0.00</span></h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <div class="gradient-bg p-6 md:p-8 rounded-[2rem] text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
+                        <i class="fas fa-wallet absolute -right-4 -bottom-4 text-7xl md:text-8xl opacity-10"></i>
+                        <p class="text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest">বর্তমান ব্যালেন্স</p>
+                        <h3 class="text-4xl md:text-5xl font-black mt-2 truncate">৳ <span id="balDisplay">0.00</span></h3>
                     </div>
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                        <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">মোট উপার্জন</p>
-                        <h3 class="text-4xl font-black text-slate-800 mt-2">৳ <span id="totalDisplay">0.00</span></h3>
+                    <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100">
+                        <p class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest">মোট উপার্জন</p>
+                        <h3 class="text-3xl md:text-4xl font-black text-slate-800 mt-2 truncate">৳ <span id="totalDisplay">0.00</span></h3>
                     </div>
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                        <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">আজকের কাজ</p>
-                        <h3 class="text-4xl font-black text-slate-800 mt-2"><span id="taskDoneDisplay">0</span> টি</h3>
+                    <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100">
+                        <p class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest">সম্পন্ন কাজ</p>
+                        <h3 class="text-3xl md:text-4xl font-black text-slate-800 mt-2 truncate"><span id="taskDoneDisplay">0</span> টি</h3>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                        <h4 class="font-black text-xl mb-6">ডেইলি বোনাস</h4>
-                        <div class="flex items-center justify-between p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+                    <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                        <h4 class="font-black text-lg md:text-xl mb-4 md:mb-6 flex items-center gap-2"><i class="fas fa-gift text-orange-500"></i> ডেইলি বোনাস</h4>
+                        <div class="flex flex-col sm:flex-row items-center justify-between p-4 md:p-6 bg-indigo-50 rounded-3xl border border-indigo-100 gap-4 text-center sm:text-left">
                             <div>
                                 <p class="font-bold text-indigo-900">প্রতিদিন ৫.০০ টাকা ফ্রি</p>
-                                <p class="text-xs text-indigo-400 font-medium">প্রতি ২৪ ঘণ্টা পর পর ক্লেইম করুন</p>
+                                <p class="text-xs text-indigo-400 font-medium mt-1">প্রতি ২৪ ঘণ্টা পর পর ক্লেইম করুন</p>
                             </div>
-                            <button onclick="claimDaily()" class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100">ক্লেইম</button>
+                            <button onclick="claimDaily()" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-transform">ক্লেইম</button>
                         </div>
                     </div>
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                        <h4 class="font-black text-xl mb-6">রেফারেল প্রোগ্রাম</h4>
+                    <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                        <h4 class="font-black text-lg md:text-xl mb-4 md:mb-6 flex items-center gap-2"><i class="fas fa-share-alt text-emerald-500"></i> রেফারেল প্রোগ্রাম</h4>
+                        <p class="text-sm text-gray-500 mb-4">আপনার বন্ধুদের ইনভাইট করুন।</p>
                         <div class="flex items-center gap-2">
-                            <input type="text" id="refLink" readonly class="flex-grow p-4 bg-slate-50 border border-gray-100 rounded-2xl text-xs font-mono font-bold" value="Loading...">
-                            <button onclick="copyRef()" class="p-4 bg-slate-900 text-white rounded-2xl"><i class="fas fa-copy"></i></button>
+                            <input type="text" id="refLink" readonly class="flex-grow p-3 md:p-4 bg-slate-50 border border-gray-100 rounded-2xl text-xs md:text-sm font-mono font-bold text-gray-600" value="Loading...">
+                            <button onclick="copyRef()" class="p-3 md:p-4 bg-slate-900 text-white rounded-2xl active:scale-95 transition-transform"><i class="fas fa-copy"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tasks View -->
-            <div id="tasksView" class="tab-content hidden-view space-y-6">
-                <h2 class="text-3xl font-black">উপলব্ধ কাজসমূহ</h2>
-                <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Tasks injected by JS -->
+            <!-- ====== Tasks View ====== -->
+            <div id="tasksView" class="tab-content hidden-view space-y-6 pb-20 md:pb-0">
+                <div class="flex justify-between items-end">
+                    <h2 class="text-2xl md:text-3xl font-black">উপলব্ধ কাজসমূহ</h2>
+                    <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold" id="taskCountBadge">০ টি</span>
+                </div>
+                <div id="taskList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                    <!-- Tasks injected by Firestore Snapshot in Realtime -->
                 </div>
             </div>
 
-            <!-- Spin View -->
-            <div id="spinView" class="tab-content hidden-view flex flex-col items-center justify-center min-h-[60vh]">
-                <div class="bg-white p-12 rounded-[3rem] shadow-2xl border border-gray-100 text-center max-w-sm w-full">
+            <!-- ====== Spin View ====== -->
+            <div id="spinView" class="tab-content hidden-view flex flex-col items-center justify-center min-h-[70vh] pb-20 md:pb-0">
+                <div class="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl border border-gray-100 text-center max-w-sm w-full relative overflow-hidden">
                     <h2 class="text-3xl font-black mb-8 text-indigo-600">লাকি স্পিন</h2>
-                    <div class="relative w-64 h-64 mx-auto mb-10">
-                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10 text-red-500 text-3xl"><i class="fas fa-caret-down"></i></div>
+                    <div class="relative w-56 h-56 md:w-64 md:h-64 mx-auto mb-10">
+                        <!-- Pointer -->
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10 text-red-500 text-4xl filter drop-shadow-md"><i class="fas fa-caret-down"></i></div>
+                        <!-- Wheel -->
                         <div id="wheel" class="w-full h-full rounded-full border-8 border-slate-800 bg-[conic-gradient(#6366f1_0deg_90deg,#8b5cf6_90deg_180deg,#ec4899_180deg_270deg,#f59e0b_270deg_360deg)] shadow-2xl flex items-center justify-center">
-                            <div class="w-12 h-12 bg-white rounded-full shadow-inner"></div>
+                            <div class="w-12 h-12 bg-white rounded-full shadow-inner flex items-center justify-center font-bold text-slate-800 text-xs">SPIN</div>
                         </div>
                     </div>
-                    <button id="spinBtn" onclick="runSpin()" class="w-full py-5 gradient-bg text-white rounded-[2rem] font-black text-xl shadow-xl shadow-indigo-100 active:scale-95 transition-transform">স্পিন শুরু করুন</button>
+                    <button id="spinBtn" onclick="runSpin()" class="w-full py-4 md:py-5 gradient-bg text-white rounded-[2rem] font-black text-lg md:text-xl shadow-xl shadow-indigo-100 active:scale-95 transition-transform">স্পিন শুরু করুন</button>
                     <p class="mt-4 text-xs font-bold text-gray-400">প্রতি স্পিনে ০.১০ থেকে ৫.০০ টাকা পর্যন্ত জিতুন</p>
                 </div>
             </div>
 
-            <!-- Wallet View -->
-            <div id="walletView" class="tab-content hidden-view space-y-8">
-                <h2 class="text-3xl font-black">টাকা উত্তোলন</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <!-- ====== Wallet View ====== -->
+            <div id="walletView" class="tab-content hidden-view space-y-6 md:space-y-8 pb-20 md:pb-0">
+                <h2 class="text-2xl md:text-3xl font-black">টাকা উত্তোলন</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
+                    <!-- Form -->
+                    <div class="lg:col-span-2 bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm h-fit">
+                        <h4 class="font-bold mb-4 flex items-center gap-2"><i class="fas fa-money-check-alt text-emerald-500"></i> নতুন রিকোয়েস্ট</h4>
                         <form id="withdrawForm" class="space-y-4">
-                            <select id="wMethod" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                            <select id="wMethod" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none text-sm md:text-base">
                                 <option value="bKash">বিকাশ (bKash)</option>
                                 <option value="Nagad">নগদ (Nagad)</option>
                                 <option value="Rocket">রকেট (Rocket)</option>
                             </select>
-                            <input type="number" id="wNum" placeholder="অ্যাকাউন্ট নম্বর (০১৭...)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none" required>
-                            <input type="number" id="wAmt" placeholder="টাকার পরিমাণ (মিনিমাম ১০০)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none" min="100" required>
-                            <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl">রিকোয়েস্ট পাঠান</button>
+                            <input type="number" id="wNum" placeholder="অ্যাকাউন্ট নম্বর (যেমন: ০১৭...)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none text-sm md:text-base" required>
+                            <input type="number" id="wAmt" placeholder="পরিমাণ (মিনিমাম ১০০৳)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none text-sm md:text-base" min="100" required>
+                            <button type="submit" class="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold shadow-xl shadow-emerald-100 active:scale-95 transition-transform">উত্তোলন করুন</button>
                         </form>
                     </div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                        <h4 class="font-bold text-gray-800 mb-6 border-b pb-4">রিসেন্ট ট্রানজেকশন</h4>
-                        <div id="withdrawHistory" class="space-y-4">
-                            <!-- Injected -->
+                    <!-- History (Realtime) -->
+                    <div class="lg:col-span-3 bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col h-[500px]">
+                        <h4 class="font-bold text-gray-800 mb-4 border-b pb-4 flex items-center gap-2"><i class="fas fa-history text-indigo-500"></i> রিসেন্ট ট্রানজেকশন</h4>
+                        <div id="withdrawHistory" class="space-y-3 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Injected Realtime -->
+                            <p class="text-center text-sm text-gray-400 mt-10">লোড হচ্ছে...</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Admin View -->
-            <div id="adminView" class="tab-content hidden-view space-y-8">
-                <div class="bg-red-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-red-100">
-                    <h2 class="text-3xl font-black">মাস্টার অ্যাডমিন কন্ট্রোল</h2>
-                    <p class="font-medium opacity-80">এখান থেকে নতুন কাজ যোগ এবং পেমেন্ট রিকোয়েস্ট ম্যানেজ করুন।</p>
+            <!-- ====== Admin View (Protected) ====== -->
+            <div id="adminView" class="tab-content hidden-view space-y-6 md:space-y-8 pb-20 md:pb-0">
+                <div class="bg-red-600 p-6 md:p-8 rounded-[2rem] text-white shadow-xl shadow-red-100 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-black flex items-center gap-2"><i class="fas fa-user-shield"></i> মাস্টার অ্যাডমিন</h2>
+                        <p class="font-medium opacity-80 mt-1 text-sm md:text-base">রিয়েল-টাইম টাস্ক এবং পেমেন্ট কন্ট্রোল প্যানেল</p>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100">
-                        <h4 class="font-black text-xl mb-6">নতুন কাজ যোগ করুন</h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                    <!-- Task Management -->
+                    <div class="bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                        <h4 class="font-black text-lg md:text-xl mb-6 border-b pb-4">নতুন কাজ (Task) যোগ করুন</h4>
                         <form id="adminTaskForm" class="space-y-4">
-                            <input type="text" id="atTitle" placeholder="কাজের শিরোনাম" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" required>
+                            <input type="text" id="atTitle" placeholder="কাজের শিরোনাম (যেমন: ভিডিও দেখুন)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-sm" required>
                             <div class="grid grid-cols-2 gap-4">
-                                <input type="number" id="atRew" placeholder="টাকা (৳)" class="p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" required>
-                                <input type="number" id="atTime" placeholder="সময় (সেকেন্ড)" class="p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" required>
+                                <input type="number" id="atRew" placeholder="টাকা (৳)" step="0.01" class="p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-sm" required>
+                                <input type="number" id="atTime" placeholder="সময় (সেকেন্ড)" class="p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-sm" required>
                             </div>
-                            <input type="url" id="atLink" placeholder="ভিডিও বা লিঙ্ক" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" required>
-                            <button class="w-full py-4 gradient-bg text-white rounded-2xl font-bold shadow-lg">পাবলিশ টাস্ক</button>
+                            <input type="url" id="atLink" placeholder="লিঙ্ক (https://...)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-sm" required>
+                            <button class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">পাবলিশ করুন</button>
                         </form>
+                        
+                        <div class="mt-8 border-t pt-6">
+                            <h4 class="font-bold text-gray-800 mb-4">অ্যাক্টিভ কাজসমূহ (ডিলিট করুন)</h4>
+                            <div id="adminActiveTasksList" class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                                <!-- Realtime active tasks for admin to delete -->
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 overflow-hidden">
-                        <h4 class="font-black text-xl mb-6 flex justify-between items-center">
+
+                    <!-- Withdraw Management -->
+                    <div class="bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col h-[700px]">
+                        <h4 class="font-black text-lg md:text-xl mb-6 flex justify-between items-center border-b pb-4">
                             পেমেন্ট রিকোয়েস্ট 
-                            <span id="pendingCount" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded-full">0</span>
+                            <span id="pendingCount" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded-full animate-pulse">0</span>
                         </h4>
-                        <div id="adminWithdrawList" class="space-y-4 max-h-[500px] overflow-y-auto">
+                        <div id="adminWithdrawList" class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
                             <!-- Admin withdraw items -->
                         </div>
                     </div>
@@ -240,15 +286,15 @@
         </main>
     </div>
 
-    <!-- Task Execution Modal -->
-    <div id="taskModal" class="fixed inset-0 z-[20000] hidden flex items-center justify-center p-6 bg-slate-900/90 backdrop-blur-md">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl">
-            <div id="timerCircle" class="w-32 h-32 rounded-full border-8 border-gray-100 border-t-indigo-600 flex items-center justify-center mx-auto mb-6">
+    <!-- Task Execution Modal (Full Screen Overlay) -->
+    <div id="taskModal" class="fixed inset-0 z-[20000] hidden flex-col items-center justify-center p-4 bg-slate-900/95 backdrop-blur-md">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 md:p-10 text-center shadow-2xl relative overflow-hidden">
+            <div id="timerCircle" class="w-28 h-28 md:w-32 md:h-32 rounded-full border-[8px] border-gray-100 border-t-indigo-600 flex items-center justify-center mx-auto mb-6 transition-all duration-300">
                 <span id="countdown" class="text-4xl font-black text-indigo-600 font-mono">00</span>
             </div>
-            <h3 class="text-2xl font-black text-slate-800 mb-2">কাজটি চলছে...</h3>
-            <p class="text-slate-400 font-medium mb-8">লিঙ্কটি ওপেন হয়েছে, দয়া করে সময় শেষ না হওয়া পর্যন্ত অপেক্ষা করুন।</p>
-            <button id="claimBtn" class="hidden w-full py-5 gradient-bg text-white rounded-2xl font-black shadow-lg animate-bounce">বোনাস সংগ্রহ করুন</button>
+            <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-2">কাজটি চলছে...</h3>
+            <p class="text-sm md:text-base text-slate-500 font-medium mb-8 leading-relaxed">লিঙ্কটি অন্য ট্যাবে ওপেন হয়েছে। দয়া করে সময় শেষ না হওয়া পর্যন্ত এই পেজেই থাকুন।</p>
+            <button id="claimBtn" class="hidden w-full py-4 md:py-5 gradient-bg text-white rounded-2xl font-black text-lg md:text-xl shadow-[0_10px_25px_rgba(99,102,241,0.4)] active:scale-95 transition-transform animate-bounce">বোনাস সংগ্রহ করুন</button>
         </div>
     </div>
 
@@ -256,9 +302,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query, where, getDocs, updateDoc, increment, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query, where, getDocs, updateDoc, increment, serverTimestamp, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config
+        // ================= CONFIGURATION =================
         const firebaseConfig = {
             apiKey: "AIzaSyBVFfghczMwAXJPGbtXVSz2ac-zoXWDcIE",
             authDomain: "micro-task-panel.firebaseapp.com",
@@ -268,22 +314,18 @@
             appId: "1:841386840972:web:8bfe920f0a3ab6392c7ca9"
         };
 
-        const ADMIN_EMAIL = "admin@gmail.com";
+        const ADMIN_EMAIL = "admin@gmail.com"; 
         const appId = firebaseConfig.projectId;
 
-        // Init App
-        let app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.error("Firebase Init Error:", e);
-        }
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
         let userState = null;
+        let profileData = null;
 
-        // UI Helpers
+        // ================= UI HELPERS =================
         const show = (id) => document.getElementById(id).classList.remove('hidden-view');
         const hide = (id) => document.getElementById(id).classList.add('hidden-view');
         
@@ -296,7 +338,37 @@
             setTimeout(() => n.classList.add('translate-x-full'), 4000);
         }
 
-        // Auth State Monitoring
+        // Mobile Sidebar Toggle
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if(sb.classList.contains('sidebar-closed')) {
+                sb.classList.remove('sidebar-closed');
+                sb.classList.add('sidebar-open');
+                overlay.classList.remove('hidden');
+            } else {
+                sb.classList.add('sidebar-closed');
+                sb.classList.remove('sidebar-open');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        // Tab Navigation
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden-view'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sidebar-link-active'));
+            show(tab + 'View');
+            const activeBtns = Array.from(document.querySelectorAll('.tab-btn')).filter(b => b.getAttribute('onclick').includes(tab));
+            activeBtns.forEach(b => b.classList.add('sidebar-link-active'));
+            
+            // Auto close sidebar on mobile when a tab is clicked
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('sidebar-closed');
+                document.getElementById('sidebarOverlay').classList.add('hidden');
+            }
+        };
+
+        // ================= AUTHENTICATION =================
         onAuthStateChanged(auth, async (user) => {
             hide('mainLoader');
             if (user) {
@@ -305,71 +377,54 @@
                 show('mainPanel');
                 document.getElementById('uIdDisplay').innerText = user.uid;
                 
+                // Check Admin Access
                 if(user.email === ADMIN_EMAIL) {
                     show('adminLink');
                     listenAdminWithdraws();
                 }
 
+                // Initialize Realtime Listeners
                 syncProfile(user.uid);
-                loadWithdraws(user.uid);
+                listenToTasksRealtime();
+                listenToUserWithdrawsRealtime(user.uid);
+                
                 switchTab('home');
             } else {
                 userState = null;
+                profileData = null;
                 show('authPanel');
                 hide('mainPanel');
             }
         });
 
-        // Tab System
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden-view'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sidebar-link-active'));
-            show(tab + 'View');
-            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tab));
-            if(activeBtn) activeBtn.classList.add('sidebar-link-active');
-
-            if(tab === 'tasks') loadTasks();
-        };
-
-        // Realtime Data Sync
-        function syncProfile(uid) {
-            onSnapshot(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), (snap) => {
-                if(snap.exists()) {
-                    const data = snap.data();
-                    document.getElementById('uNameDisplay').innerText = data.name;
-                    document.getElementById('balDisplay').innerText = data.balance.toFixed(2);
-                    document.getElementById('totalDisplay').innerText = data.totalEarnings.toFixed(2);
-                    document.getElementById('taskDoneDisplay').innerText = data.completedTasksCount || 0;
-                    document.getElementById('refLink').value = `${window.location.origin}/?ref=${uid.substring(0, 5)}`;
-                }
-            });
-        }
-
         // Registration
         document.getElementById('regForm').onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('regEmail').value;
-            const pass = document.getElementById('regPass').value;
-            const name = document.getElementById('regName').value;
-            
+            const btn = e.target.querySelector('button');
+            btn.innerText = "অপেক্ষা করুন..."; btn.disabled = true;
             try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                const cred = await createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value, document.getElementById('regPass').value);
                 await setDoc(doc(db, 'artifacts', appId, 'users', cred.user.uid, 'profile', 'data'), {
-                    name, email, balance: 0, totalEarnings: 0, completedTasksCount: 0, createdAt: serverTimestamp()
+                    name: document.getElementById('regName').value, 
+                    email: document.getElementById('regEmail').value, 
+                    balance: 0, totalEarnings: 0, completedTasksCount: 0, 
+                    createdAt: serverTimestamp()
                 });
                 notify("সাফল্য!", "অ্যাকাউন্ট তৈরি হয়েছে");
             } catch (err) { notify("ব্যর্থ!", err.message, true); }
+            finally { btn.innerText = "রেজিস্ট্রেশন করুন"; btn.disabled = false; }
         };
 
         // Login
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+            btn.innerText = "লগইন হচ্ছে..."; btn.disabled = true;
             try {
-                await signInWithEmailAndPassword(auth, email, pass);
+                await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
                 notify("স্বাগতম!", "লগইন সফল হয়েছে");
-            } catch (err) { notify("ভুল!", "ইমেইল বা পাসওয়ার্ড ভুল", true); }
+            } catch (err) { notify("ভুল!", "ইমেইল বা পাসওয়ার্ড সঠিক নয়", true); }
+            finally { btn.innerText = "লগইন করুন"; btn.disabled = false; }
         };
 
         window.toggleAuth = (isLogin) => {
@@ -379,42 +434,95 @@
 
         window.appLogout = () => signOut(auth);
 
-        // Task Loader
-        async function loadTasks() {
-            const container = document.getElementById('taskList');
-            container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-spinner fa-spin text-2xl text-indigo-500"></i></div>';
-            
+        // ================= REALTIME PROFILE =================
+        function syncProfile(uid) {
+            onSnapshot(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), (snap) => {
+                if(snap.exists()) {
+                    profileData = snap.data();
+                    document.getElementById('uNameDisplay').innerText = profileData.name;
+                    document.getElementById('balDisplay').innerText = profileData.balance.toFixed(2);
+                    document.getElementById('totalDisplay').innerText = profileData.totalEarnings.toFixed(2);
+                    document.getElementById('taskDoneDisplay').innerText = profileData.completedTasksCount || 0;
+                    document.getElementById('refLink').value = `${window.location.origin}/?ref=${uid.substring(0, 5).toUpperCase()}`;
+                }
+            });
+        }
+
+        window.copyRef = () => {
+            const input = document.getElementById('refLink');
+            input.select();
+            document.execCommand('copy');
+            notify("কপি সম্পন্ন", "আপনার রেফারেল লিঙ্ক কপি হয়েছে।");
+        };
+
+        // ================= REALTIME TASKS SYSTEM (User & Admin) =================
+        function listenToTasksRealtime() {
             const q = collection(db, 'artifacts', appId, 'public', 'data', 'tasks');
-            const snap = await getDocs(q);
-            container.innerHTML = '';
             
-            snap.forEach(d => {
-                const t = d.data();
-                const div = document.createElement('div');
-                div.className = "bg-white p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between";
-                div.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><i class="fas fa-play"></i></div>
-                        <div>
-                            <h4 class="font-bold text-slate-800">${t.title}</h4>
-                            <p class="text-xs text-indigo-500 font-bold">পুরস্কার: ৳${t.reward} | সময়: ${t.timer}s</p>
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('taskList');
+                const adminList = document.getElementById('adminActiveTasksList');
+                container.innerHTML = '';
+                adminList.innerHTML = '';
+                
+                document.getElementById('taskCountBadge').innerText = `${snap.size} টি কাজ`;
+
+                if(snap.empty) {
+                    container.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 font-bold bg-white rounded-[2rem] border border-gray-100 shadow-sm">বর্তমানে কোনো কাজ নেই। অ্যাডমিন কাজ দিলে এখানে স্বয়ংক্রিয়ভাবে চলে আসবে।</div>';
+                    adminList.innerHTML = '<p class="text-xs text-gray-400">কোনো কাজ নেই</p>';
+                    return;
+                }
+
+                snap.forEach(d => {
+                    const t = d.data();
+                    const taskId = d.id;
+
+                    // 1. Render for Users
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-5 md:p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3 md:gap-4 overflow-hidden pr-2">
+                            <div class="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 bg-indigo-50 text-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center"><i class="fas fa-play"></i></div>
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-slate-800 text-sm md:text-base truncate">${t.title}</h4>
+                                <p class="text-[10px] md:text-xs text-indigo-500 font-bold mt-1">৳${t.reward} • ${t.timer}s</p>
+                            </div>
                         </div>
-                    </div>
-                    <button onclick="startTask('${d.id}', ${t.reward}, ${t.timer}, '${t.link}')" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-xs">শুরু</button>
-                `;
-                container.appendChild(div);
+                        <button onclick="startTask('${taskId}', ${t.reward}, ${t.timer}, '${t.link}')" class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 bg-slate-900 text-white rounded-xl font-bold text-xs md:text-sm active:scale-95 transition-transform">শুরু</button>
+                    `;
+                    container.appendChild(div);
+
+                    // 2. Render for Admin (Delete option)
+                    if(userState && userState.email === ADMIN_EMAIL) {
+                        const adiv = document.createElement('div');
+                        adiv.className = "flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100";
+                        adiv.innerHTML = `
+                            <p class="text-xs font-bold truncate pr-2">${t.title} (৳${t.reward})</p>
+                            <button onclick="deleteTask('${taskId}')" class="text-red-500 hover:text-red-700 bg-red-100 px-3 py-1 rounded text-xs font-bold"><i class="fas fa-trash"></i></button>
+                        `;
+                        adminList.appendChild(adiv);
+                    }
+                });
             });
         }
 
         window.startTask = async (id, rew, time, link) => {
+            // Check Completion
             const compSnap = await getDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'tasks', id));
-            if(compSnap.exists()) return notify("ব্যর্থ", "এই কাজটি ইতিমধ্যে করা হয়েছে", true);
+            if(compSnap.exists()) return notify("ব্যর্থ", "এই কাজটি আপনি ইতিমধ্যে করে ফেলেছেন।", true);
 
             window.open(link, '_blank');
-            show('taskModal');
-            hide('claimBtn');
-            let left = time;
+            const modal = document.getElementById('taskModal');
+            const claimBtn = document.getElementById('claimBtn');
             const count = document.getElementById('countdown');
+            const ring = document.getElementById('timerCircle');
+            
+            modal.classList.replace('hidden', 'flex');
+            claimBtn.classList.add('hidden');
+            ring.classList.replace('border-emerald-500', 'border-t-indigo-600');
+            count.classList.replace('text-emerald-500', 'text-indigo-600');
+            
+            let left = time;
             count.innerText = left;
 
             const timer = setInterval(() => {
@@ -422,78 +530,151 @@
                 count.innerText = left < 10 ? '0'+left : left;
                 if(left <= 0) {
                     clearInterval(timer);
-                    show('claimBtn');
+                    ring.classList.replace('border-t-indigo-600', 'border-emerald-500');
+                    count.classList.replace('text-indigo-600', 'text-emerald-500');
+                    count.innerHTML = '<i class="fas fa-check"></i>';
+                    claimBtn.classList.remove('hidden');
                 }
             }, 1000);
 
-            document.getElementById('claimBtn').onclick = async () => {
-                await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), {
-                    balance: increment(rew),
-                    totalEarnings: increment(rew),
-                    completedTasksCount: increment(1)
-                });
-                await setDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'tasks', id), { done: true });
-                hide('taskModal');
-                notify("সফল", `৳${rew} আপনার ব্যালেন্সে যোগ হয়েছে`);
+            claimBtn.onclick = async () => {
+                claimBtn.innerText = "অপেক্ষা করুন...";
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), {
+                        balance: increment(rew),
+                        totalEarnings: increment(rew),
+                        completedTasksCount: increment(1)
+                    });
+                    await setDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'tasks', id), { done: true, time: serverTimestamp() });
+                    modal.classList.replace('flex', 'hidden');
+                    notify("সফল", `৳${rew} আপনার ব্যালেন্সে যোগ হয়েছে`);
+                } catch(e) {
+                    notify("ত্রুটি", "সার্ভার সমস্যা, আবার চেষ্টা করুন", true);
+                } finally {
+                    claimBtn.innerText = "বোনাস সংগ্রহ করুন";
+                }
             };
         };
 
-        // Withdraw System
+        // ================= USER WITHDRAWALS (Realtime) =================
         document.getElementById('withdrawForm').onsubmit = async (e) => {
             e.preventDefault();
             const amt = parseFloat(document.getElementById('wAmt').value);
             const method = document.getElementById('wMethod').value;
             const num = document.getElementById('wNum').value;
+            const btn = e.target.querySelector('button');
 
-            const profileSnap = await getDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'));
-            if(profileSnap.data().balance < amt) return notify("দুঃখিত", "পর্যাপ্ত ব্যালেন্স নেই", true);
+            if(!profileData || profileData.balance < amt) return notify("দুঃখিত", "আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই", true);
 
-            await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), { balance: increment(-amt) });
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'withdraws'), {
-                uid: userState.uid, amount: amt, method, num, status: 'Pending', createdAt: serverTimestamp(), userName: profileSnap.data().name
-            });
-            notify("সফল", "রিকোয়েস্ট পেন্ডিং রয়েছে");
-            e.target.reset();
-            loadWithdraws(userState.uid);
+            btn.innerText = "প্রসেসিং..."; btn.disabled = true;
+            try {
+                // Deduct Balance
+                await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), { balance: increment(-amt) });
+                // Add Request
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'withdraws'), {
+                    uid: userState.uid, userName: profileData.name, amount: amt, method, num, status: 'Pending', createdAt: serverTimestamp()
+                });
+                notify("সফল", "উত্তোলনের রিকোয়েস্ট অ্যাডমিনের কাছে পাঠানো হয়েছে");
+                e.target.reset();
+            } catch(err) {
+                notify("ত্রুটি", err.message, true);
+            } finally {
+                btn.innerText = "উত্তোলন করুন"; btn.disabled = false;
+            }
         };
 
-        async function loadWithdraws(uid) {
+        function listenToUserWithdrawsRealtime(uid) {
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'withdraws'), where("uid", "==", uid));
-            const snap = await getDocs(q);
-            const container = document.getElementById('withdrawHistory');
-            container.innerHTML = '';
-            snap.forEach(d => {
-                const w = d.data();
-                const div = document.createElement('div');
-                div.className = "p-4 bg-slate-50 rounded-2xl flex justify-between items-center";
-                div.innerHTML = `<div><p class="font-bold text-sm">${w.method}</p><p class="text-[10px] text-gray-400 font-bold">${w.num}</p></div><div class="text-right"><p class="font-bold">৳${w.amount}</p><span class="text-[10px] uppercase font-black ${w.status === 'Approved' ? 'text-emerald-500' : 'text-amber-500'}">${w.status}</span></div>`;
-                container.appendChild(div);
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('withdrawHistory');
+                container.innerHTML = '';
+                
+                if(snap.empty) {
+                    container.innerHTML = '<p class="text-center text-sm text-gray-400 py-10">কোনো হিস্ট্রি পাওয়া যায়নি</p>';
+                    return;
+                }
+
+                // Convert to array to sort by time
+                const records = [];
+                snap.forEach(d => records.push(d.data()));
+                records.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                records.forEach(w => {
+                    const isPending = w.status === 'Pending';
+                    const isApprove = w.status === 'Approved';
+                    const statusColor = isApprove ? 'text-emerald-600 bg-emerald-100' : (isPending ? 'text-amber-600 bg-amber-100' : 'text-red-600 bg-red-100');
+                    const statusText = isApprove ? 'সফল' : (isPending ? 'পেন্ডিং' : 'বাতিল');
+
+                    const div = document.createElement('div');
+                    div.className = "p-4 bg-slate-50 border border-gray-100 rounded-2xl flex justify-between items-center";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-sm text-slate-800">${w.method}</p>
+                            <p class="text-[11px] text-gray-500 font-bold font-mono mt-1">${w.num}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-black text-lg text-slate-800 mb-1">৳${w.amount}</p>
+                            <span class="px-2 py-1 text-[10px] uppercase font-black rounded-md ${statusColor}">${statusText}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
             });
         }
 
-        // Daily Claim
+        // ================= DAILY & SPIN =================
         window.claimDaily = async () => {
-            const docRef = doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data');
-            const snap = await getDoc(docRef);
-            const last = snap.data().lastDaily || 0;
-            const now = Date.now();
-            if(now - last < 86400000) return notify("দুঃখিত", "২৪ ঘণ্টা পর আবার চেষ্টা করুন", true);
+            if(!profileData) return;
+            const today = new Date().toISOString().split('T')[0];
+            if(profileData.lastDailyClaim === today) return notify("দুঃখিত", "আপনি আজকের ডেইলি বোনাস ইতিমধ্যে নিয়ে নিয়েছেন।", true);
             
-            await updateDoc(docRef, { balance: increment(5), lastDaily: now });
-            notify("সাফল্য", "৳৫.০০ বোনাস যোগ হয়েছে");
+            await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), { 
+                balance: increment(5), totalEarnings: increment(5), lastDailyClaim: today 
+            });
+            notify("সাফল্য", "আপনার ব্যালেন্সে ৳৫.০০ ফ্রি বোনাস যোগ হয়েছে!");
         };
 
-        // Admin Actions
+        window.runSpin = () => {
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true; btn.innerText = "ঘুরছে...";
+            const wheel = document.getElementById('wheel');
+            const deg = 3600 + Math.floor(Math.random() * 360);
+            wheel.style.transform = `rotate(${deg}deg)`;
+            
+            setTimeout(async () => {
+                const win = (Math.random() * 5).toFixed(2);
+                await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), { 
+                    balance: increment(parseFloat(win)), totalEarnings: increment(parseFloat(win))
+                });
+                notify("অভিনন্দন!", `আপনি স্পিন করে ৳${win} জিতেছেন`);
+                btn.disabled = false; btn.innerText = "স্পিন শুরু করুন";
+            }, 4000);
+        };
+
+        // ================= ADMIN LOGIC =================
         document.getElementById('adminTaskForm').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
-                title: document.getElementById('atTitle').value,
-                reward: parseFloat(document.getElementById('atRew').value),
-                timer: parseInt(document.getElementById('atTime').value),
-                link: document.getElementById('atLink').value
-            });
-            notify("টাস্ক পাবলিশড", "সফলভাবে কাজ যোগ হয়েছে");
-            e.target.reset();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "পাবলিশ হচ্ছে..."; btn.disabled = true;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
+                    title: document.getElementById('atTitle').value,
+                    reward: parseFloat(document.getElementById('atRew').value),
+                    timer: parseInt(document.getElementById('atTime').value),
+                    link: document.getElementById('atLink').value,
+                    createdAt: serverTimestamp()
+                });
+                notify("সফল", "নতুন কাজ ইউজারদের প্যানেলে যোগ হয়েছে");
+                e.target.reset();
+            } catch (err) { notify("ত্রুটি", err.message, true); }
+            finally { btn.innerText = "পাবলিশ করুন"; btn.disabled = false; }
+        };
+
+        window.deleteTask = async (taskId) => {
+            if(confirm('আপনি কি সত্যিই এই কাজটি মুছে ফেলতে চান?')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId));
+                notify("সফল", "কাজটি মুছে ফেলা হয়েছে");
+            }
         };
 
         function listenAdminWithdraws() {
@@ -501,19 +682,33 @@
                 const container = document.getElementById('adminWithdrawList');
                 container.innerHTML = '';
                 let count = 0;
-                snap.forEach(d => {
-                    const w = d.data();
+                
+                const records = [];
+                snap.forEach(d => records.push({id: d.id, ...d.data()}));
+                records.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                records.forEach(w => {
                     if(w.status === 'Pending') count++;
+                    const isPending = w.status === 'Pending';
+                    
                     const div = document.createElement('div');
-                    div.className = "p-4 border border-gray-100 rounded-2xl space-y-3";
+                    div.className = `p-4 border rounded-2xl space-y-3 ${isPending ? 'bg-white border-red-100 shadow-sm' : 'bg-gray-50 border-gray-100'}`;
                     div.innerHTML = `
-                        <div class="flex justify-between">
-                            <p class="font-bold text-sm">${w.userName}</p>
-                            <p class="font-black">৳${w.amount}</p>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <p class="font-bold text-sm text-slate-800"><i class="fas fa-user text-gray-400 mr-1"></i> ${w.userName}</p>
+                            <p class="font-black text-lg text-emerald-600">৳${w.amount}</p>
                         </div>
-                        <div class="flex justify-between items-center text-[10px] font-bold">
-                            <p class="text-indigo-600">${w.method}: ${w.num}</p>
-                            ${w.status === 'Pending' ? `<button onclick="approveWithdraw('${d.id}')" class="px-4 py-2 bg-emerald-500 text-white rounded-lg">Approve</button>` : `<span class="text-emerald-500">PAID</span>`}
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <div>
+                                <p class="text-indigo-600">${w.method}</p>
+                                <p class="font-mono text-gray-600">${w.num}</p>
+                            </div>
+                            ${isPending ? `
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <button onclick="handleWithdraw('${w.id}', 'Approved')" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-sm active:scale-95 transition-transform"><i class="fas fa-check mr-1"></i> Approve</button>
+                                    <button onclick="handleWithdraw('${w.id}', 'Rejected', '${w.uid}', ${w.amount})" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-sm active:scale-95 transition-transform"><i class="fas fa-times mr-1"></i> Reject</button>
+                                </div>
+                            ` : `<span class="px-3 py-1 rounded-md text-[10px] uppercase ${w.status === 'Approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}"><i class="fas ${w.status === 'Approved' ? 'fa-check' : 'fa-times'} mr-1"></i> ${w.status}</span>`}
                         </div>
                     `;
                     container.appendChild(div);
@@ -522,25 +717,16 @@
             });
         }
 
-        window.approveWithdraw = async (id) => {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'withdraws', id), { status: 'Approved' });
-            notify("পেমেন্ট সম্পন্ন", "রিকোয়েস্ট অ্যাপ্রুভ হয়েছে");
-        };
-
-        // Spin Logic
-        window.runSpin = () => {
-            const btn = document.getElementById('spinBtn');
-            btn.disabled = true;
-            const wheel = document.getElementById('wheel');
-            const deg = 3600 + Math.floor(Math.random() * 360);
-            wheel.style.transform = `rotate(${deg}deg)`;
-            
-            setTimeout(async () => {
-                const win = (Math.random() * 2).toFixed(2);
-                await updateDoc(doc(db, 'artifacts', appId, 'users', userState.uid, 'profile', 'data'), { balance: increment(parseFloat(win)) });
-                notify("অভিনন্দন!", `আপনি স্পিন করে ৳${win} জিতেছেন`);
-                btn.disabled = false;
-            }, 4000);
+        window.handleWithdraw = async (id, status, uid = null, amount = null) => {
+            if(!confirm(`আপনি কি রিকোয়েস্টটি ${status} করতে চান?`)) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'withdraws', id), { status });
+                // Refund balance if rejected
+                if(status === 'Rejected' && uid && amount) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), { balance: increment(amount) });
+                }
+                notify("সফল", `পেমেন্ট স্ট্যাটাস আপডেট হয়েছে (${status})`);
+            } catch (err) { notify("ত্রুটি", err.message, true); }
         };
 
     </script>
